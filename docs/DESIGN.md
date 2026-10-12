@@ -2,7 +2,7 @@
 
 One skill and one CLI/hook entry route to distinct measurement engines. Mode-specific acceptance rules remain intact; GUI controls are not reduced to screenshot-only checks and CSS does not inherit unrelated GUI build requirements.
 
-- CSS retains bin/css-guard.mjs, rendered style/cascade/rectangle measurement, existing scope/protection rules, legacy configuration and evidence storage.
+- CSS retains bin/css-guard.mjs, rendered style/cascade/rectangle measurement, existing scope/protection rules, legacy configuration and evidence storage. Cascade source candidates account for reversed important-layer order, declaration order and direction-dependent logical properties; invalid declarations and CDP's duplicate CSSOM summaries are excluded. Source candidates remain distinct from rendered dimensions, screenshots and computed values.
 - GUI retains the version-2 native/source runtime protocol, copy/build identity, DPI/state, comparison controls, font requirements, validation inputs and immutable evidence receipts. It lives under engines/gui without a standalone SKILL.md.
 - SVG reuses the browser toolchain, adds shape/text/paint/transform data and comparison-pixel checks, and writes its own .render-guard/svg state. CSS evidence cannot satisfy SVG edits.
 

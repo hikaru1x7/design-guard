@@ -41,3 +41,34 @@ test('完全な URL の measure は baseUrl と static を要求しない', asyn
     await server.close();
   }
 });
+
+test('cascade は important の逆レイヤー順と同一レイヤーの優先度、後のinline宣言を守る', async (t) => {
+  const project = await tempProject({ static: `${repo}/test/fixtures/cascade-priority` });
+  t.after(async () => { await fs.rm(project.root, { recursive: true, force: true }); await fs.rm(project.home, { recursive: true, force: true }); });
+  for (const [id, expected, selector] of [
+    ['layered', '24px', '#layered'], ['nested', '31px', '#nested'],
+    ['specific', '42px', '#specific'], ['inline', '45px', 'style attribute'], ['normal', '13px', '#normal']
+  ]) {
+    const result = json(await cli(project, ['measure', '/index.html', `#${id}`, '--widths', '1280']));
+    const source = result.widths[0].cascade.find(item => item.property === 'padding-left');
+    assert.equal(source.declared, expected, id);
+    assert.equal(source.computed, expected, id);
+    assert.equal(source.selector, selector, id);
+  }
+});
+
+test('cascade は方向別の論理指定とショートハンドの宣言順を反映し、無効な宣言を除く', async (t) => {
+  const project = await tempProject({ static: `${repo}/test/fixtures/cascade-priority` });
+  t.after(async () => { await fs.rm(project.root, { recursive: true, force: true }); await fs.rm(project.home, { recursive: true, force: true }); });
+  for (const [id, property, declared, computed] of [
+    ['ltr', 'padding-left', '22px', '22px'], ['rtl', 'padding-right', '23px', '23px'],
+    ['vertical', 'padding-top', '25px', '25px'], ['mixed', 'padding-left', '10px 30px', '10px'],
+    ['mixed', 'padding-right', '7px', '7px'], ['invalid', 'width', '170px', '170px']
+  ]) {
+    const result = json(await cli(project, ['measure', '/index.html', `#${id}`, '--widths', '1280']));
+    const source = result.widths[0].cascade.find(item => item.property === property);
+    assert.equal(source.declared, declared, `${id} ${property}`);
+    assert.equal(source.computed, computed, `${id} ${property}`);
+    assert.match(source.source, /site\.css:\d+$/);
+  }
+});

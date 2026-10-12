@@ -1,0 +1,24 @@
+@layer base, theme;
+@layer base {
+  #layered { padding-left: 24px !important; }
+  @layer first { #nested { padding-left: 31px !important; } }
+  @layer second { #nested { padding-left: 32px !important; } }
+  #nested { padding-left: 33px !important; }
+  .candidate { padding-left: 41px !important; }
+  #specific { padding-left: 42px !important; }
+  #inline { padding-left: 46px !important; }
+  #normal { padding-left: 11px; }
+}
+@layer theme {
+  #layered { padding-left: 8px !important; }
+  #nested { padding-left: 34px !important; }
+  #normal { padding-left: 12px; }
+}
+#layered { padding-left: 3px !important; }
+#nested { padding-left: 35px !important; }
+#normal { padding-left: 13px; }
+#ltr { padding-left: 4px; padding-inline-start: 22px; }
+#rtl { direction: rtl; padding-right: 4px; padding-inline-start: 23px; }
+#vertical { writing-mode: vertical-rl; padding-top: 4px; padding-inline-start: 25px; }
+#mixed { padding-left: 4px; padding-inline: 10px 30px; padding-right: 7px; }
+#invalid { width: 170px; width: definitely-invalid; }

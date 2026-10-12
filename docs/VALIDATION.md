@@ -1,5 +1,11 @@
 # RenderGuard validation
 
+## CSS cascade source correction (2026-10-13)
+
+Browser regressions reproduced incorrect source candidates for layered important declarations (reported 3px instead of the effective 24px) and a logical padding declaration (reported 4px instead of 22px). The fix preserves normal browser rule order, reverses the layer order for important declarations, maps logical properties using the element's computed writing mode/direction, and uses authored declaration order instead of re-reading CDP's appended CSSOM summaries. Invalid declarations are excluded. The evidence schema and rendered rectangle/screenshot routines remain unchanged.
+
+The new regressions cover nested layers, specificity within a layer, repeated inline important declarations, ordinary unlayered declarations, LTR, RTL, vertical writing, mixed logical shorthand/physical longhand order and invalid declarations. The public checkout passed all 13 checks in `node --test test/measure.test.mjs test/render.test.mjs test/snap.test.mjs`; the Japanese checkout passed the same 13 checks in two targeted runs. Existing percentage/variable/shorthand/inheritance sources, common CSS gates, SVG comparison protections, version-change rejection and image-difference checks still pass. This is validation of the reported cases and related regressions, not every possible CSS cascade feature.
+
 ## Scoped GUI checks and safe retry reuse (2026-10-02)
 
 Small GUI changes can use preconfigured suites selected by a unique exact file-scope match. Missing/ambiguous mappings keep all checks. The plan and validation code are frozen at begin, shared build sources remain tracked, and profile dependency lists cannot remove common inputs. Refresh cannot hide shared-source edits. Legacy pending records without the original plan cannot be backfilled into a pass.
