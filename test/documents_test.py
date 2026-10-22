@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -93,6 +94,19 @@ class Documents(unittest.TestCase):
             box, word = target['paintedBoxPt'], target['words'][0]
             self.assertLess(abs(box[0]-word['xMin']),3)
             self.assertLess(abs(box[1]-word['yMin']),3)
+
+    def test_xml_entities_from_text_extraction_are_rejected(self):
+        from defusedxml.common import DefusedXmlException
+        original = MEASURE.subprocess.check_output
+        payload = b'<!DOCTYPE doc [<!ENTITY leaked SYSTEM "file:///not-to-be-read">]><doc>&leaked;</doc>'
+        def extracted(command, *args, **kwargs):
+            if command[0] == 'pdftotext':
+                return payload
+            return original(command, *args, **kwargs)
+        with patch.object(MEASURE.subprocess, 'check_output', side_effect=extracted):
+            with self.assertRaises(DefusedXmlException):
+                self.record('hostile_xml')
+        self.assertFalse((self.root / 'evidence/hostile_xml.json').exists())
 
     def test_invalid_or_empty_measurement_is_not_success(self):
         for roi in ([0,0,10,10], [-1,0,30,30], [0,0,500,500]):

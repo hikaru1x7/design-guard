@@ -10,7 +10,6 @@ from pathlib import Path
 import subprocess
 import sys
 import uuid
-import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 # Share the maintained private Pillow environment; leave OS Python unchanged.
 for parent in Path(__file__).resolve().parents:
@@ -23,6 +22,7 @@ for parent in Path(__file__).resolve().parents:
             raise RuntimeError('Prepare the shared image runtime with render-guard gui update before measurement.')
         sys.path.insert(0, str(packages))
         break
+import defusedxml.ElementTree as ET
 from PIL import Image, ImageChops, __version__ as pillow_version
 
 

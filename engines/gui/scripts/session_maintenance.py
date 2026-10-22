@@ -25,7 +25,7 @@ def save(path, value):
 
 def latest_versions():
     windows = os.name == 'nt' or Path('/mnt/c/Windows').exists()
-    requests = {'Pillow': 'https://pypi.org/pypi/Pillow/json'}
+    requests = {'Pillow': 'https://pypi.org/pypi/Pillow/json', 'defusedxml': 'https://pypi.org/pypi/defusedxml/json'}
     if windows:
         requests['WinAppCLI'] = 'https://api.github.com/repos/microsoft/winappCli/releases/latest'
     def fetch(item):
@@ -33,7 +33,7 @@ def latest_versions():
         request = urllib.request.Request(url, headers={'User-Agent': 'gui-guard-maintenance'})
         with urllib.request.urlopen(request, timeout=3) as response:
             data = json.load(response)
-        return name, data['info']['version'] if name == 'Pillow' else data['tag_name']
+        return name, data['info']['version'] if name != 'WinAppCLI' else data['tag_name']
     with ThreadPoolExecutor(max_workers=2) as pool:
         return dict(pool.map(fetch, requests.items()))
 
@@ -42,15 +42,16 @@ def installed_versions():
     # Read private distributions directly, including a runtime created by a child updater.
     environments = [ROOT / '.runtime' / f'python-{sys.version_info.major}.{sys.version_info.minor}']
     sites = [site for environment in environments for pattern in ['lib/python*/site-packages', 'Lib/site-packages'] for site in environment.glob(pattern)]
-    private = [d.version for d in importlib.metadata.distributions(path=[str(p) for p in sites]) if d.metadata['Name'].lower() == 'pillow']
-    if private:
-        pillow = private[0]
-    else:
-        try:
-            pillow = importlib.metadata.version('Pillow')
-        except importlib.metadata.PackageNotFoundError:
-            pillow = None
-    value = {'Pillow': pillow}
+    private = {d.metadata['Name'].lower(): d.version for d in importlib.metadata.distributions(path=[str(p) for p in sites])}
+    value = {}
+    for name in ['Pillow', 'defusedxml']:
+        if name.lower() in private:
+            value[name] = private[name.lower()]
+        else:
+            try:
+                value[name] = importlib.metadata.version(name)
+            except importlib.metadata.PackageNotFoundError:
+                value[name] = None
     if os.name == 'nt' or Path('/mnt/c/Windows').exists():
         pointer = ROOT / '.runtime/winapp-current.json'
         value['WinAppCLI'] = json.loads(pointer.read_text())['version'] if pointer.exists() else None
