@@ -13,7 +13,7 @@ DesignGuard combines RenderGuard and Design Quality. It continues CSS Guard’s 
 | SVG | Shapes and comparisons, paint/text styles, transforms, local geometry and PNGs | Playwright |
 | Word | Actual text positions and native page images | Microsoft Word desktop |
 | PowerPoint | Separate shape/text bounds and native slide images | Microsoft PowerPoint desktop |
-| PDF | Delivered PDF text and painted-pixel bounds | Poppler + Pillow |
+| PDF | Delivered PDF text and painted-pixel bounds | Poppler + Pillow + defusedxml |
 | Other visual work | Actual output and comparisons in the intended environment | Appropriate existing tools |
 
 Pillow, pixelmatch and pngjs compare images; they do not replace rendered control measurements. Office measurements use the actual intended Microsoft application; browser previews or converted PDFs do not certify desktop Office.

@@ -26,13 +26,14 @@ def fetch(url):
 
 def update_pillow():
     latest = json.loads(fetch('https://pypi.org/pypi/Pillow/json'))['info']['version']
+    xml_latest = json.loads(fetch('https://pypi.org/pypi/defusedxml/json'))['info']['version']
     environment = RUNTIME / ('python-' + str(sys.version_info.major) + '.' + str(sys.version_info.minor))
     python = environment / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
     if not python.exists():
         venv.EnvBuilder(with_pip=True).create(environment)
     subprocess.run([str(python), '-m', 'pip', 'install', '--upgrade', 'pip'], check=True)
     # 指定なしのupgradeで古い互換版に留まることを避け、正式版を明示する。
-    subprocess.run([str(python), '-m', 'pip', 'install', '--upgrade', '--only-binary=:all:', 'Pillow==' + latest], check=True)
+    subprocess.run([str(python), '-m', 'pip', 'install', '--upgrade', '--only-binary=:all:', 'Pillow==' + latest, 'defusedxml==' + xml_latest], check=True)
     actual = subprocess.check_output([str(python), '-c', "import importlib.metadata; print(importlib.metadata.version('Pillow'))"], text=True).strip()
     if actual != latest:
         raise ValueError('Pillow installed version differs from the checked stable release: ' + actual)
