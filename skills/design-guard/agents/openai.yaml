@@ -1,3 +1,3 @@
 interface:
   display_name: "DesignGuard"
-  short_description: "Guard visual edits and measure actual output across media"
+  short_description: "Chrome DevTools browser workflows and measured visual edits"

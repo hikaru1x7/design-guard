@@ -1,5 +1,11 @@
 # RenderGuard validation
 
+## Browser interaction guidance (2026-11-04)
+
+The skill description, UI summary and browser reference now cover browsing, input, saving, downloads and functional checks with Chrome DevTools MCP. Browser interaction alone does not trigger visual measurements or CSS scope declarations. Playwright is not automatically restored when an old script requests it; a new user instruction is required. Existing GUI measurement and native image-capture code, runtime code and hooks are unchanged.
+
+After Playwright was removed from the validation environment, the existing installed Chrome DevTools MCP connection opened an isolated in-memory form, read its snapshot, filled two fields and read back the expected values. The test tab was closed. This is a browser smoke check, not validation of arbitrary applications or native desktop operations. Skill metadata, relative links and diff formatting were checked for this documentation change; the full runtime suite was not rerun.
+
 ## Chrome DevTools migration (2026-11-03)
 
 CSS and SVG now use Chrome DevTools MCP with a separately managed Chrome for Testing Stable browser. Playwright packages and browser-cache lookup are removed from the production dependency and launch paths. The installer uses the [official browser manager](https://pptr.dev/browsers-api); daily checks include Chrome itself using [Google's Stable metadata](https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions.json), independently of MCP's npm version. Existing command names, scope/evidence gates and other measurement modes remain in place. Chrome uses a temporary profile, loopback-only debugging and enabled sandboxing. MCP usage statistics and CrUX are disabled using the [official options](https://github.com/ChromeDevTools/chrome-devtools-mcp).

@@ -1,9 +1,10 @@
 ---
 name: design-guard
 license: CC0-1.0
-description: Guard user intent and edit scope in visual creation and revision; measure actual output to prevent regressions. Use for Web, GUI, SVG, Word, PowerPoint, PDF, diagrams, images and video, not prose-only edits or nonvisual code changes.
+description: Use for browser interaction and visual creation or revision. Verify operation targets and results; measure Web, GUI, SVG, Word, PowerPoint, PDF, diagrams, images and video to prevent regressions. Excludes prose-only or nonvisual code edits without browser interaction.
 ---
 
+- **Browser interaction:** read [browser operations](references/browser.md). Use Chrome DevTools MCP, without switching to Playwright. Browsing, input and saving alone do not require the visual-production steps below. Apply both workflows when also creating or revising appearance.
 - Preserve user instructions, approved design and edit scope. Inspect references directly. Visual-only work must preserve content, behavior, numbers, required wording and captions. Propose out-of-scope improvements; review-only requests do not authorize edits.
 - Revisions cover changed elements, comparisons and affected areas. Align same-role dimensions, baselines, text, padding and colors; retain meaningful differences. Titles state subject and point briefly; put explanation in body text. Reconsider layout/wrapping before shrinking isolated text.
 - Read [creation](references/create.md) **only when building an artifact from scratch**. Revisions, new sessions and follow-up edits do not reset creation mode.

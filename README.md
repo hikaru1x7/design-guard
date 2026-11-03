@@ -1,8 +1,8 @@
 # DesignGuard
 
-**Measure the display. Keep edits within the request.**
+**Operate the browser. Measure the display. Keep work within the request.**
 
-One skill for requested visual work: CSS, native GUIs, SVG, Word, PowerPoint, PDF, diagrams, images and video. Ordinary revisions focus on guarding instructions and existing work; only from-scratch creation loads the extra design-building reference. Text-only or nonvisual work is excluded.
+One skill for browser interaction and requested visual work: CSS, native GUIs, SVG, Word, PowerPoint, PDF, diagrams, images and video. [Browser operations](skills/design-guard/references/browser.md) use Chrome DevTools MCP and verify targets and results. Ordinary visual revisions focus on guarding instructions and existing work; only from-scratch creation loads the extra design-building reference. Text-only or nonvisual edits without browser interaction are excluded.
 
 DesignGuard combines RenderGuard and Design Quality. It continues CSS Guard’s established measurement and scope protection. Existing CSS/GUI/SVG measurement and protection behavior, and shared hooks, remain in use. The public repository and skill are named `design-guard`; CLI, hook commands, configuration and state names keep `render-guard` for compatibility.
 
@@ -47,7 +47,7 @@ Project-specific checks can import `withChrome` from `lib/chrome-automation.mjs`
 
 ## Ordinary use
 
-Ask for visual creation or revisions normally. Invoke `$design-guard` in Codex or `/design-guard` in Claude when needed. The agent reads only the relevant mode instructions and handles measurement/check commands.
+Ask for browser interaction, visual creation or revisions normally. Invoke `$design-guard` in Codex or `/design-guard` in Claude when needed. The agent reads only the relevant references. Browsing, input, saving and functional checks use Chrome DevTools MCP; these operations alone do not require visual measurements or CSS scope declarations. Playwright is not used or automatically reinstalled. Browser guidance does not add enforcement hooks, and existing desktop operation and image-capture methods are unchanged.
 
 ```bash
 render-guard update # First applicable skill/hook use each day.
