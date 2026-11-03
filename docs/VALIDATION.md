@@ -10,6 +10,12 @@ A separate public-CLI exercise measured a real CSS change from 128px to 176px at
 
 Old or unversioned screenshot baselines are preserved and rejected. Review and explicitly renew them before editing with `render-guard css snap --baseline` (or `svg`), never during an unverified before/after comparison. Other projects' browser caches are left intact. The previous Playwright measurements below are historical records.
 
+## Shared project automation follow-up (2026-11-03)
+
+Added the shared Chrome automation entry for existing project scripts. Four targeted browser checks pass with Playwright imports blocked: trusted input, actual DPR 8 raster dimensions/transparency/resize, saved-page interception/iframe evaluation/error propagation, and distinct DOMContentLoaded/load waits while an image response is explicitly held. DPR overrides are applied to the screenshot CDP session as well as MCP, preventing CSS-sized captures from being mistaken for high-resolution PNGs. Guard measurements still use scale 1 by default. This follow-up used targeted checks; the larger test totals in the initial migration record above were not rerun.
+
+Project checks also exercised TsukuLab's 32 overflow states and actual high-resolution input measurement, the flea-market monitor's saved-page selectors without network requests, and archived image/video generation in isolated output folders. No production UI, data collection, or monitoring logic was changed.
+
 ## CSS cascade source correction (2026-10-13)
 
 Browser regressions reproduced incorrect source candidates for layered important declarations (reported 3px instead of the effective 24px) and a logical padding declaration (reported 4px instead of 22px). The fix preserves normal browser rule order, reverses the layer order for important declarations, maps logical properties using the element's computed writing mode/direction, and uses authored declaration order instead of re-reading CDP's appended CSSOM summaries. Invalid declarations are excluded. The evidence schema and rendered rectangle/screenshot routines remain unchanged.

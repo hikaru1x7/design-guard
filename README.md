@@ -43,6 +43,8 @@ npx skills add hikaru1x7/design-guard --skill design-guard
 
 Or read [the skill](skills/design-guard/SKILL.md) from your checkout. Installing instructions alone does not install tools or hooks. Other agents must review scope and evidence directly; verify cannot prove unrecorded edits.
 
+Project-specific checks can import `withChrome` from `lib/chrome-automation.mjs`. It shares daily Stable updates and isolated-browser cleanup, and supports the requested capture scale and local request interception. This API does not replace scope declarations or evidence verification.
+
 ## Ordinary use
 
 Ask for visual creation or revisions normally. Invoke `$design-guard` in Codex or `/design-guard` in Claude when needed. The agent reads only the relevant mode instructions and handles measurement/check commands.
