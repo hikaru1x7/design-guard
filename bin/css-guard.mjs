@@ -166,12 +166,6 @@ function help() {
   process.stdout.write('css-guard: update, begin, scope, measure, snap, approve, status, verify, packet, hook-pre, hook-post, hook-stop, hook-bash, doctor\n');
 }
 
-async function playwrightVersion() {
-  // 導入済み package.json から Playwright の版を読む。
-  const { installedVersions } = await import('../lib/maintenance.mjs');
-  return (await installedVersions()).playwright;
-}
-
 async function main() {
   // サブコマンドを解釈し、JSON 指定時以外は人向け表示にする。
   const command = process.argv[2];
@@ -334,8 +328,10 @@ async function main() {
   }
 
   if (command === 'doctor') {
-    const { chromium } = await import('playwright');
-    const executable = chromium.executablePath();
+    const { chromeExecutable } = await import('../lib/chrome-runtime.mjs');
+    const { installedVersions } = await import('../lib/maintenance.mjs');
+    let executable;
+    try { executable = chromeExecutable(); } catch {}
     let exists = false;
     let configExists = false;
 
@@ -343,26 +339,28 @@ async function main() {
       await fs.access(executable);
       exists = true;
     } catch {
-      // 下の診断結果で未導入として表示する。
+      // Report an unavailable browser in diagnostics.
     }
 
     try {
       await fs.access(config.file);
       configExists = true;
     } catch {
-      // 既定値だけでも診断は続ける。
+      // Continue diagnostics with defaults.
     }
 
     const value = {
       node: process.version,
-      playwright: await playwrightVersion(),
-      chromium: { executable, available: exists },
+      backend: 'chrome-devtools',
+      toolchain: exists ? await installedVersions() : null,
+      chrome: { executable, available: exists },
+      privacy: { usageStatistics: false, performanceCrux: false },
       config: { file: config.file, exists: configExists, loaded: config }
     };
     return flags.json ? jsonOutput(value) : printTable(['Item', 'Value'], [
       ['Node', value.node],
-      ['Playwright', value.playwright],
-      ['Chromium', value.chromium.available ? 'available' : 'not installed'],
+      ['Chrome DevTools MCP', value.toolchain?.['chrome-devtools-mcp'] || 'not installed'],
+      ['Chrome Stable', value.toolchain?.chrome || 'not installed'],
       ['Config', value.config.exists ? 'present' : 'defaults']
     ]);
   }

@@ -34,7 +34,7 @@ async function requests(t, root) {
   t.after(() => server.close());
   return (url) => new Promise((resolve, reject) => {
     let status, headers;
-    Promise.resolve(handler({ url }, {
+    Promise.resolve(handler({ url, headers: { host: '127.0.0.1:12345' } }, {
       writeHead(code, values) { status = code; headers = values; return this; },
       end(body) { resolve({ status, headers, body: body?.toString() }); }
     })).catch(reject);

@@ -12,5 +12,5 @@ render-guard svg verify
 ```
 
 - Select a unique target and separate unchanged comparisons, never its parent/descendant. Group multiple requested shapes and place comparisons outside. Check geometry, styles, markup and captured pixels.
-- Inspect Playwright rectangles, paint/stroke, transforms, viewBox, attributes and text lengths. geometryBox is local geometry, not full stroke/filter/glyph pixels. Open PNGs to inspect clipping and stroke overflow.
+- Inspect Chrome DevTools MCP/managed Chrome Stable rectangles, paint/stroke, transforms, viewBox, attributes and text lengths. geometryBox is local geometry, not full stroke/filter/glyph pixels. Open PNGs to inspect clipping and stroke overflow.
 - Missing setup: use the svg section in [the example](../../../render-guard.example.json). Evidence in `.render-guard/svg/` must not overwrite CSS. List dynamic generators in svgFiles; unconfigured projects, direct shell writes and all dynamic paths are not fully protected. Inspect full-page diffs including expected changes.

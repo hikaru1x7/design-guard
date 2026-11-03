@@ -1,6 +1,6 @@
 # CSS
 
-Use Playwright for rectangles, parent layout, computed styles and cascade rules. Serve and edit the same tree. Choose widths/actions according to project requirements and change reach; keep them fixed.
+Use Chrome DevTools MCP and managed Chrome Stable for rectangles, parent layout, computed styles and cascade rules. Serve and edit the same tree. Choose widths/actions according to project requirements and change reach; keep them fixed.
 
 ```bash
 render-guard css begin --scope '<file>' # add --snap for configured full-page comparisons

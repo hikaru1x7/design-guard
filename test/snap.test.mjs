@@ -13,3 +13,23 @@ test('snap は基準から変化ピクセル数を出し、無変更なら 0', a
   json(await cli(project, ['snap', '--baseline']));
   const same = json(await cli(project, ['snap'])); assert.equal(same.entries[0].changedPixels, 0);
 });
+
+test('snap preserves old baselines and refuses changed or unrecorded browser versions', async t => {
+  const project = await tempProject({ widths: [375] });
+  t.after(async () => { await fs.rm(project.root, { recursive: true, force: true }); await fs.rm(project.home, { recursive: true, force: true }); });
+  const first = json(await cli(project, ['snap']));
+  const file = first.entries[0].baseline;
+  const original = await fs.readFile(file);
+  const metadata = JSON.parse(await fs.readFile(`${file}.json`, 'utf8'));
+  await fs.writeFile(`${file}.json`, JSON.stringify({ ...metadata, chrome: 'old-version' }));
+  const stale = await cli(project, ['snap']);
+  assert.equal(stale.code, 1);
+  assert.match(stale.stderr, /baseline tool versions differ/);
+  assert.deepEqual(await fs.readFile(file), original);
+  await fs.rm(`${file}.json`);
+  const missing = await cli(project, ['snap']);
+  assert.equal(missing.code, 1);
+  assert.deepEqual(await fs.readFile(file), original);
+  json(await cli(project, ['snap', '--baseline']));
+  assert.equal(json(await cli(project, ['snap'])).entries[0].changedPixels, 0);
+});

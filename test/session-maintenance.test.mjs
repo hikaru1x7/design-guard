@@ -16,8 +16,8 @@ async function fixture(t) {
 test('同じ日は初回だけ確認し、作業数によらずネット・更新・試験を繰り返さない', async (t) => {
   const home = await fixture(t);
   let checks = 0, updates = 0;
-  const options = { home, now: new Date(2026, 9, 2), latest: async () => { checks++; return { playwright: '1.63.0' }; },
-    installed: async () => ({ playwright: '1.63.0' }), update: async () => { updates++; } };
+  const options = { home, now: new Date(2026, 9, 2), latest: async () => { checks++; return { 'chrome-devtools-mcp': '1.63.0' }; },
+    installed: async () => ({ 'chrome-devtools-mcp': '1.63.0' }), update: async () => { updates++; } };
   await checkDay(options);
   for (let index = 0; index < 20; index++) {
     assert.equal((await updateDay(options)).skipped, true);
@@ -31,8 +31,8 @@ test('同じ日は初回だけ確認し、作業数によらずネット・更�
 test('フック先発で新版を検出した後、スキル側の更新は1回だけ行う', async (t) => {
   const home = await fixture(t);
   let checks = 0, updates = 0;
-  const options = { home, latest: async () => { checks++; return { playwright: '2' }; },
-    installed: async () => ({ playwright: updates ? '2' : '1' }), update: async () => { updates++; return { versions: { playwright: '2' } }; } };
+  const options = { home, latest: async () => { checks++; return { 'chrome-devtools-mcp': '2' }; },
+    installed: async () => ({ 'chrome-devtools-mcp': updates ? '2' : '1' }), update: async () => { updates++; return { versions: { 'chrome-devtools-mcp': '2' } }; } };
   assert.equal((await checkDay(options)).status, 'needs-update');
   await updateDay(options);
   await updateDay(options);
@@ -40,7 +40,7 @@ test('フック先発で新版を検出した後、スキル側の更新は1回�
   assert.equal(checks, 1); assert.equal(updates, 1);
 });
 
-test('同時の初回発動でも確認は1回、失敗した日はは自動再試行しない', async (t) => {
+test('同時の初回発動でも確認は1回、失敗した日は自動再試行しない', async (t) => {
   const home = await fixture(t);
   let checks = 0;
   const options = { home, latest: async () => { checks++; await new Promise((resolve) => setTimeout(resolve, 20)); throw new Error('offline'); }, installed: async () => ({}) };
@@ -54,7 +54,12 @@ test('実際の編集前フックはプロジェクトをまたいでもネッ�
   process.env.CSS_GUARD_HOME = home;
   const versions = await installedVersions();
   let requests = 0;
-  globalThis.fetch = async (url) => { requests++; return { ok: true, json: async () => ({ version: versions[String(url).split('/').at(-2)] }) }; };
+  globalThis.fetch = async (url) => {
+    requests++;
+    const name = decodeURIComponent(new URL(url).pathname.slice(1).replace(/\/latest$/, ''));
+    return { ok: true, json: async () => String(url).includes('chrome-for-testing')
+      ? { channels: { Stable: { version: versions.chrome } } } : { version: versions[name] } };
+  };
   t.after(() => { globalThis.fetch = previousFetch; if (previousHome === undefined) delete process.env.CSS_GUARD_HOME; else process.env.CSS_GUARD_HOME = previousHome; });
   for (const project of ['a', 'b', 'a']) {
     const root = path.join(home, project);
@@ -65,12 +70,12 @@ test('実際の編集前フックはプロジェクトをまたいでもネッ�
       tool_input: { file_path: path.join(root, 'style.css'), old_string: '10px', new_string: '12px' } });
   }
   await updateDay({ home, update: async () => { throw new Error('再更新は禁止'); } });
-  assert.equal(requests, 3); // 3部品を最初の1回だけ取得
+  assert.equal(requests, 5); // Four npm packages and Chrome Stable, once per day.
 });
 
 test('更新コマンドが成功しても実際の版が古ければ更新成功を記録しない', async (t) => {
   const home = await fixture(t);
-  const options = { home, latest: async () => ({ playwright: '2' }), installed: async () => ({ playwright: '1' }), update: async () => ({ versions: { playwright: '2' } }) };
+  const options = { home, latest: async () => ({ 'chrome-devtools-mcp': '2' }), installed: async () => ({ 'chrome-devtools-mcp': '1' }), update: async () => ({ versions: { 'chrome-devtools-mcp': '2' } }) };
   await assert.rejects(updateDay(options), /do not match/);
   assert.equal((await checkDay(options)).status, 'failed');
 });

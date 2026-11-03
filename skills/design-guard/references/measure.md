@@ -1,5 +1,6 @@
 # CSS / GUI / SVG only
 
+- CSS/SVG use Chrome DevTools MCP and managed Chrome Stable, independent of everyday browsers and Playwright caches. Baselines with missing/different browser versions are preserved but rejected; inspect and renew with snap --baseline before editing. Do not switch versions or baselines during a before/after comparison.
 - Confirm usable project settings, measurements and hooks. Read setup details only when missing. Unconfigured work is not automatically protected. Reuse existing settings/evidence; verify every edited mode.
 - First applicable use per local-calendar day: `render-guard update` (GUI: add `--project <source-root>`). Skills and before-edit/Bash hooks share records across tasks/sessions. Current tools skip installs/tests. Never auto-retry failures, claim an unverified update succeeded or change tool versions during a comparison.
 - Declare necessary files with begin; measure requested elements, parents/comparisons, relevant text settings and state before editing; open PNGs. File scope is not permission for every change. Preserve other edits and behavior.

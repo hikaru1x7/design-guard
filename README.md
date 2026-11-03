@@ -8,19 +8,21 @@ DesignGuard combines RenderGuard and Design Quality. It continues CSS Guard’s 
 
 | Mode | Measurement | Tool |
 |---|---|---|
-| CSS | Rendered rectangles, computed styles, parent layout, rule sources and PNGs | Playwright |
+| CSS | Rendered rectangles, computed styles, parent layout, rule sources and PNGs | Chrome DevTools MCP |
 | GUI | Correct running application, controls and comparisons, DPI, text and PNGs | Native Win32, UIAutomation, WinAppCLI or a project adapter |
-| SVG | Shapes and comparisons, paint/text styles, transforms, local geometry and PNGs | Playwright |
+| SVG | Shapes and comparisons, paint/text styles, transforms, local geometry and PNGs | Chrome DevTools MCP |
 | Word | Actual text positions and native page images | Microsoft Word desktop |
 | PowerPoint | Separate shape/text bounds and native slide images | Microsoft PowerPoint desktop |
 | PDF | Delivered PDF text and painted-pixel bounds | Poppler + Pillow + defusedxml |
 | Other visual work | Actual output and comparisons in the intended environment | Appropriate existing tools |
 
+CSS/SVG use Chrome DevTools MCP and a separately managed Chrome for Testing Stable browser. Daily maintenance checks Chrome itself as well as the npm packages. Playwright and its browser cache are not used. Each run uses an isolated profile; everyday Brave/Chrome tabs and settings are not attached. Usage statistics and CrUX requests are disabled.
+
 Pillow, pixelmatch and pngjs compare images; they do not replace rendered control measurements. Office measurements use the actual intended Microsoft application; browser previews or converted PDFs do not certify desktop Office.
 
 ## Install once
 
-Requires Git, Node.js 20.11+, Python 3.10+, npm, Bash, and an agent that can run local commands and inspect images. Windows control measurement requires Windows/WSL and a compatible adapter.
+Requires Git, Node.js 22.15+, Python 3.10+, npm, Bash, and an agent that can run local commands and inspect images. Chrome extraction needs unzip on Linux/macOS or tar.exe on Windows. Windows control measurement requires Windows/WSL and a compatible adapter.
 
 ```bash
 git clone https://github.com/hikaru1x7/design-guard.git
@@ -28,7 +30,7 @@ cd design-guard
 ./install.sh
 ```
 
-The installer validates stable dependencies, installs matching Chromium and a private GUI image runtime, and installs applicable Windows measurement dependencies. It links the single skill into `~/.agents/skills/design-guard` and `~/.claude/skills/design-guard`, creates `~/.local/bin/render-guard`, and merges four shared hook handlers into both agents' settings. Unrelated settings/hooks remain intact; changed settings are backed up. Owned old RenderGuard registrations migrate to DesignGuard. Legacy CLI aliases remain for project compatibility and are not separate skills. Existing Design Quality directories are preserved; archive and unregister them separately when migrating that owned installation.
+The installer validates stable dependencies, installs the official Chrome for Testing Stable release and a private GUI image runtime, and installs applicable Windows measurement dependencies. It links the single skill into `~/.agents/skills/design-guard` and `~/.claude/skills/design-guard`, creates `~/.local/bin/render-guard`, and merges four shared hook handlers into both agents' settings. Unrelated settings/hooks remain intact; changed settings are backed up. Owned old RenderGuard registrations migrate to DesignGuard. Legacy CLI aliases remain for project compatibility and are not separate skills. Existing Design Quality directories are preserved; archive and unregister them separately when migrating that owned installation.
 
 Codex: review and trust the new hooks in `/hooks`. Registration is not activation. Claude Code: start a new session after installation. Keep the checkout and `~/.local/bin` on PATH. Existing real skill directories are preserved.
 
@@ -54,6 +56,8 @@ render-guard css measure / '#target' --label after
 render-guard css snap
 render-guard css verify
 ```
+
+Baselines from another browser/version are preserved and rejected rather than silently overwritten. Before editing, inspect and deliberately renew them with `render-guard css snap --baseline` (or `svg`). Keep versions fixed during each before/after comparison.
 
 GUI uses `render-guard gui begin → build → after → verify`; source-based applications skip build but verify actually loaded sources. SVG uses `render-guard svg begin → measure before → measure after → verify`. For mixed tasks, check each edited mode. File scope is not permission to change every element in those files. Change scope without clearing evidence.
 
@@ -81,7 +85,7 @@ The operating system’s local calendar date selects a small shared record. Sess
 
 Daily reuse reads a small file per toolchain, shared across sessions and projects. The operating system’s local date selects the record; the next day’s first applicable use checks again. A before/after comparison cannot pass if its measurement tool versions changed.
 
-Private GUI dependencies leave system Python/Pillow and application libraries unchanged. Shared older Playwright browsers are preserved. WinAppCLI downloads require the official asset checksum and executable version, telemetry is disabled, and changed versions run actual Windows fixtures before success is recorded.
+Private GUI dependencies leave system Python/Pillow and application libraries unchanged. Browser caches belonging to other projects are preserved. Managed Chrome lives in `~/.cache/design-guard/chrome` (`RENDER_GUARD_BROWSER_HOME` overrides that location). WinAppCLI downloads require the official asset checksum and executable version, telemetry is disabled, and changed versions run actual Windows fixtures before success is recorded.
 
 ## Checks and practical limits
 

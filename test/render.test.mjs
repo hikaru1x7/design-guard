@@ -128,7 +128,7 @@ test('CSS comparison rejects tool version changes without clearing pending edits
   const status = json(await render(project, ['css', 'status', '--json']));
   const file = status.state.lastMeasure.path;
   const baseline = JSON.parse(await fs.readFile(file, 'utf8'));
-  baseline.toolchain.playwright = 'old-version';
+  baseline.toolchain.chrome = 'old-version';
   await fs.writeFile(file, JSON.stringify(baseline));
   const payload = { cwd: project.root, tool_name: 'Edit', tool_input: { file_path: path.join(project.root, 'css/a.css'), old_string: '100px', new_string: '120px' } };
   await render(project, ['hook-post'], JSON.stringify(payload));

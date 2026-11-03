@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { after } from 'node:test';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -6,11 +7,16 @@ import path from 'node:path';
 import { sessionRecord, dayId } from '../lib/session-maintenance.mjs';
 
 export const repo = path.resolve(import.meta.dirname, '..');
+const temporaryProjects = [];
+after(async () => {
+  await Promise.all(temporaryProjects.flatMap(({ root, home }) => [root, home]).map(file => fs.rm(file, { recursive: true, force: true })));
+});
 
 export async function tempProject(config = {}) {
   // CSS Guard 用の設定と最小ファイルを持つ一時プロジェクトを作る。
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'css-guard-project-'));
   const home = await fs.mkdtemp(path.join(os.tmpdir(), 'css-guard-state-'));
+  temporaryProjects.push({ root, home });
   await fs.mkdir(path.join(root, 'css'), { recursive: true });
   await fs.writeFile(path.join(root, 'css', 'a.css'), '.box{width:100px}\n');
   await fs.writeFile(path.join(root, 'note.md'), '# note\n');
@@ -20,7 +26,8 @@ export async function tempProject(config = {}) {
     ...config
   })}\n`);
 
-  return { root, home, env: { ...process.env, CSS_GUARD_HOME: home } };
+  return { root, home, env: { ...process.env, CSS_GUARD_HOME: home,
+    NODE_OPTIONS: `${process.env.NODE_OPTIONS || ''} --import=${new URL('./deny-playwright.mjs', import.meta.url).href}`.trim() } };
 }
 
 export async function cli(project, params, stdin = '') {
