@@ -12,6 +12,8 @@ Old or unversioned screenshot baselines are preserved and rejected. Review and e
 
 ## Shared project automation follow-up (2026-11-03)
 
+The capture/measurement timeout fallback explicitly waits for `load`, retaining its previous behavior after correcting DOMContentLoaded handling. The focused pending-image/load check passed after this adjustment.
+
 Added the shared Chrome automation entry for existing project scripts. Four targeted browser checks pass with Playwright imports blocked: trusted input, actual DPR 8 raster dimensions/transparency/resize, saved-page interception/iframe evaluation/error propagation, and distinct DOMContentLoaded/load waits while an image response is explicitly held. DPR overrides are applied to the screenshot CDP session as well as MCP, preventing CSS-sized captures from being mistaken for high-resolution PNGs. Guard measurements still use scale 1 by default. This follow-up used targeted checks; the larger test totals in the initial migration record above were not rerun.
 
 Project checks also exercised TsukuLab's 32 overflow states and actual high-resolution input measurement, the flea-market monitor's saved-page selectors without network requests, and archived image/video generation in isolated output folders. No production UI, data collection, or monitoring logic was changed.
