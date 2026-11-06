@@ -1,0 +1,21 @@
+name: Code security
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: code-security-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  code-and-secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check code and new commits for secrets
+        run: python3 .github/security/check.py
